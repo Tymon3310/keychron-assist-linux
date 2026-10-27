@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag matches version
+        run: |
+          v=$(jq -r .version tauri.conf.json)
+          [ "v$v" = "${GITHUB_REF_NAME}" ] || { echo "tag ${GITHUB_REF_NAME} != version $v"; exit 1; }
+      - name: System libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev patchelf
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: cargo test --locked
+      - name: Build AppImage, deb, rpm
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+        run: npx --yes @tauri-apps/cli@2 build
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          b=target/release/bundle
+          cd "$b" && sha256sum appimage/*.AppImage deb/*.deb rpm/*.rpm | sed 's#  .*/#  #' > SHA256SUMS && cd -
+          gh release create "${GITHUB_REF_NAME}" --draft --title "${GITHUB_REF_NAME}" --generate-notes \
+            $b/appimage/*.AppImage $b/deb/*.deb $b/rpm/*.rpm $b/SHA256SUMS

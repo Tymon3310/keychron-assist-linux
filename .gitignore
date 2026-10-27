@@ -1,0 +1,11 @@
+/target/
+/gen/
+# Keychron's interface is downloaded at first run, never committed.
+/ui/
+# Local-only: the previous attempt and the VM test harness.
+/archive/
+/re/tools/
+/re/bin/
+*.AppImage
+*.deb
+*.rpm

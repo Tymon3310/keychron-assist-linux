@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keychron Assistant setup</title>
+<style>
+  /* Same palette as Keychron's interface (assets/styles/global.css), which is dark only. */
+  :root { --bg: #111111; --card: #1f1f1f; --fg: #ffffff; --muted: rgba(255, 255, 255, 0.65);
+          --line: rgba(255, 255, 255, 0.1); --err: #ff6b47; color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--fg);
+         font: 14px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+  main { width: min(560px, calc(100vw - 32px)); background: var(--card); border: 1px solid var(--line);
+         border-radius: 12px; padding: 32px; animation: up .4s ease-out; }
+  @keyframes up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+  p { margin-bottom: 12px; color: var(--muted); }
+  code { display: block; font-size: 12px; word-break: break-all; color: rgba(255, 255, 255, 0.85);
+         background: rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 8px 12px; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+  button { font: inherit; font-weight: 500; padding: 8px 24px; border-radius: 24px; cursor: pointer; color: #fff;
+           background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); transition: all .3s ease; }
+  button:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.3); }
+  button.primary { background: linear-gradient(135deg, #ff6b47, #e54a2a); border-color: transparent; }
+  button.primary:hover { background: linear-gradient(135deg, #e54a2a, #d43f24); transform: translateY(-2px); }
+  button:disabled { opacity: .5; cursor: default; transform: none; }
+  .bar { height: 6px; margin-top: 20px; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden; display: none; }
+  .bar > div { height: 100%; width: 0; background: linear-gradient(90deg, #ff6b47, #e54a2a); transition: width .2s; }
+  #status { margin-top: 12px; min-height: 1.5em; color: var(--muted); }
+  #status.err { color: var(--err); }
+  body.pair main { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>One more step</h1>
+  <p>This Linux port uses the interface of Keychron's official Keychron Assistant. It isn't included here,
+     so the app takes it from the official Windows installer, published by Keychron at:</p>
+  <p><code id="url"></code></p>
+  <p>Only the interface files are unpacked. The download is checked against a known hash.</p>
+  <div class="row">
+    <button class="primary" id="dl">Download from Keychron</button>
+    <button id="file">Use a downloaded file…</button>
+  </div>
+  <div class="bar" id="bar"><div id="fill"></div></div>
+  <div id="status"></div>
+</main>
+<script>
+  const inv = (c, a) => window.__TAURI_INTERNALS__.invoke(c, a);
+  if (new URLSearchParams(location.search).get('window')) document.body.classList.add('pair');
+  const $ = id => document.getElementById(id);
+  const status = (t, err) => { $('status').textContent = t; $('status').className = err ? 'err' : ''; };
+  let timer;
+  async function poll() {
+    const s = await inv('ui_setup_status');
+    const p = s.progress;
+    if (p && p.phase === 'download' && p.total) {
+      $('bar').style.display = 'block'; $('fill').style.width = (100 * p.done / p.total) + '%';
+      status(`Downloading… ${(p.done / 1048576).toFixed(1)} / ${(p.total / 1048576).toFixed(1)} MB`);
+    } else if (p && p.phase === 'extract') status('Unpacking…');
+  }
+  async function run(cmd) {
+    $('dl').disabled = $('file').disabled = true; status('Starting…');
+    timer = setInterval(poll, 200);
+    try { await inv(cmd); status('Done. Loading…'); }
+    catch (e) { status(String(e), true); $('dl').disabled = $('file').disabled = false; }
+    finally { clearInterval(timer); }
+  }
+  $('dl').onclick = () => run('ui_setup_download');
+  $('file').onclick = () => run('ui_setup_from_file');
+  inv('ui_setup_status').then(s => { $('url').textContent = s.url; if (s.installed) location.reload(); });
+</script>
+</body>
+</html>

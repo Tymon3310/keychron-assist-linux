@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Keychron Assistant (Linux)
+GenericName=Keyboard and mouse sharing
+Comment={{comment}}
+Exec={{exec}}
+Icon={{icon}}
+Categories={{categories}}
+Keywords=keychron;keyboard;mouse;share;cross-screen;file transfer;
+Terminal=false

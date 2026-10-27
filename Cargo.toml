@@ -1,0 +1,42 @@
+[package]
+name = "keychron-assist-linux"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tymon"]
+description = "Unofficial Linux port of Keychron Assistant"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/Tymon3310/keychron-assist-linux"
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = "0.26"
+futures-util = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["preserve_order"] }
+dirs = "6.0"
+walkdir = "2"
+evdev = "0.12"
+rfd = "0.15"
+uuid = { version = "1.10", features = ["v4", "fast-rng"] }
+local-ip-address = "0.6"
+socket2 = "0.5"
+shell-words = "1.1"
+base64 = "0.22"
+log = "0.4"
+libc = "0.2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-process = "2"
+tauri-plugin-autostart = "2"
+tauri-plugin-single-instance = "2"
+zbus = { version = "5", default-features = false, features = ["blocking-api", "async-io"] }
+x11rb = { version = "0.13", features = ["randr"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+lzma-rs = "0.3"
+brotli-decompressor = "5"
+sha2 = "0.10"
+ureq = "3"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }

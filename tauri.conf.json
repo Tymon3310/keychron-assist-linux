@@ -1,0 +1,85 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "keychron-assist-linux",
+  "version": "0.1.0",
+  "identifier": "io.github.tymon3310.keychron-assist-linux",
+  "build": {
+    "frontendDist": "frontend"
+  },
+  "app": {
+    "trayIcon": {
+      "iconPath": "icons/128x128.png",
+      "tooltip": "Keychron Assistant"
+    },
+    "windows": [
+      {
+        "label": "main",
+        "title": "Keychron Assistant",
+        "url": "index.html",
+        "width": 960,
+        "height": 640,
+        "resizable": true,
+        "visible": false,
+        "center": true
+      },
+      {
+        "label": "pair-confirm",
+        "title": "Connection Request",
+        "url": "index.html?window=pair-confirm",
+        "width": 460,
+        "height": 300,
+        "resizable": true,
+        "transparent": true,
+        "decorations": false,
+        "alwaysOnTop": true,
+        "visible": false,
+        "center": true,
+        "minWidth": 460,
+        "maxWidth": 460,
+        "minHeight": 300,
+        "maxHeight": 300
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "mainBinaryName": "keychron-assist-linux",
+  "bundle": {
+    "active": true,
+    "targets": [
+      "appimage",
+      "deb",
+      "rpm"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.png"
+    ],
+    "category": "Utility",
+    "publisher": "Tymon3310",
+    "homepage": "https://github.com/Tymon3310/keychron-assist-linux",
+    "license": "GPL-3.0-or-later",
+    "shortDescription": "Unofficial Linux port of Keychron Assistant",
+    "longDescription": "Share one keyboard and mouse between a Linux PC and computers running Keychron Assistant for Windows or macOS, and send files between them. Keychron's interface is downloaded from Keychron on first run.",
+    "linux": {
+      "deb": {
+        "desktopTemplate": "packaging/keychron-assist-linux.desktop",
+        "files": {
+          "/usr/lib/udev/rules.d/60-keychron-assist-linux.rules": "packaging/60-keychron-assist-linux.rules"
+        }
+      },
+      "rpm": {
+        "desktopTemplate": "packaging/keychron-assist-linux.desktop",
+        "files": {
+          "/usr/lib/udev/rules.d/60-keychron-assist-linux.rules": "packaging/60-keychron-assist-linux.rules"
+        }
+      },
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    }
+  }
+}
